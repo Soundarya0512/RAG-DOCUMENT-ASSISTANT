@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Document Assistant</title>
+    <!-- Link to CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+        <h1>🤖 RAG Document Assistant </h1>
+        <p> Ask questions about your documents</p>
+        </div>
+
+        <div class="chat-area" id="chatArea">
+
+        </div>
+
+        <div class="status" id="status">
+
+        </div>        
+    
+        <div class="input-area">
+            <!-- File Upload -->
+             <p> Click on "Choose File"</p>
+            <input type="file" id="fileInput">
+            <!-- Question Input  -->
+            <input type="text" id="questionInput" placeholder="Enter the question">
+            <!-- Send the Request  -->
+            <button id="sendBtn">Send</button>
+            <!-- Clear button -->
+            <button id="clearBtn">Clear Chat</button>
+
+        </div>
+
+    </div>
+<script src="script.js"></script> 
+</body>
+</html>
