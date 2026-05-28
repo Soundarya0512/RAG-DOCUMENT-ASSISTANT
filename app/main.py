@@ -77,7 +77,7 @@ async def clear_history():
 async def upload_file(file: UploadFile = File(...)):
 
     filetype=file.content_type
-    MAX_SIZE=10 * 1024 * 1024
+    MAX_SIZE= 50 * 1024 * 1024
 
     if filetype not in ["application/pdf", "text/plain"]:
         raise HTTPException(status_code=400, detail="Invalid file type.Only PDF and txt files are allowed")

@@ -10,6 +10,8 @@ from langchain_classic.retrievers import EnsembleRetriever
 from langchain_core.documents import Document
 from langchain_classic.memory import ConversationBufferMemory
 from langchain_classic.chains import ConversationalRetrievalChain
+import os
+from pathlib import Path
 
 class RAGChatbot:
     def __init__(self):
@@ -33,39 +35,50 @@ class RAGChatbot:
     
     def ingest_documents(self):
         #Loads documents, splits them into chunks, and creates vector embeddings
-        documents=[]
-        try:
-            loader= DirectoryLoader(path=DATA_FOLDER, glob="**/*.pdf",loader_cls=PyPDFLoader) 
-            pdf_docs=loader.load()
-            documents.extend(pdf_docs)
+        print("Processing documents...")
 
-            loader= DirectoryLoader(path=DATA_FOLDER, glob="**/*.txt",loader_cls=TextLoader)
-            text_docs=loader.load()
-            documents.extend(text_docs)
+        data_path=Path("data")
+        files=list(data_path.glob("**/*"))
 
-            if not documents:
-                print("No documents found in the data folder.")
-                return
-            #Split documents into chunks
-            text_splitter= RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
-            chunks=text_splitter.split_documents(documents)
-            print(f"Total chunks created: {len(chunks)}")
+        if not files:
+            print("No files Found")
+            return False
 
-            #Create vector embeddings and store in ChromaDB
-            print("Creating vector and saving to ChromaDB...")
-            self.vectorstore= Chroma.from_documents(documents=chunks,embedding=self.embeddings,persist_directory=VECTOR_DB_PATH)
-            print("Vector created and saved")
-            return True
+        # Create the chunk-splitter tool (ONCE!)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=CHUNK_SIZE,
+            chunk_overlap=CHUNK_OVERLAP
+        )
+        #  Create empty database (ONCE!)
+        self.vectorstore = Chroma(
+            embedding_function=self.embeddings,
+            persist_directory=VECTOR_DB_PATH
+        )
 
+        total_chunks=0
+
+        for file in files:
+            if file.suffix==".pdf":
+                loader= PyPDFLoader(str(file))
+            elif file.suffix==".txt":
+                loader= TextLoader(str(file))
+            else:
+                continue
+        
+            for page in loader.lazy_load():
+                chunks=text_splitter.split_documents([page])
             
-        except FileNotFoundError:
-            print("File Not Found ")
-            return
+                if chunks:
+                    self.vectorstore.add_documents(chunks)
+                    total_chunks+=len(chunks)
+        
+        print(f"Total chunks: {total_chunks}")
+        self.build_hybrid_retriever()
+        return True
+        
 
-        except Exception as e:
-            print("File maybe corrupted", e)
-            return
 
+       
     def load_vector_store(self):
         """Load existing vector database from disk"""
         try:
@@ -123,7 +136,7 @@ class RAGChatbot:
 
         for doc in result["source_documents"]:
             source_info={"source" : doc.metadata.get("source","Unknown"),
-                         "page": doc.metadata.get("page","N/A"),
+                         "page": str(doc.metadata.get("page","N/A")),
                          "preview": doc.page_content[:200]
 
             }
