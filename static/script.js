@@ -18,7 +18,7 @@ async function send(){
     let question = userinput.value;
     chatarea.innerHTML += "<div class='user-message'>👤 " + question + "</div>";
     status.innerHTML += "🤖 Thinking... "
-    let response=await fetch ("http://localhost:8000/query",{
+    let response=await fetch ("http://localhost:8000/query_with_history",{
         method: "POST",
         headers:{
             "Content-Type": "application/json"
@@ -28,6 +28,9 @@ async function send(){
     });
 
     let data= await response.json();
+
+    console.log("Full response:", data); 
+    console.log("Sources:", data.sources);  
     status.innerHTML = "";
     chatarea.innerHTML += "<div class='bot-message'>🤖 " + data.answer + "</div>";
     data.sources.forEach((source) => {

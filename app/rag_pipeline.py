@@ -13,13 +13,19 @@ from langchain_classic.chains import ConversationalRetrievalChain
 import os
 from pathlib import Path
 
+from langchain_groq import ChatGroq
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 class RAGChatbot:
     def __init__(self):
         #Text to vector
         self.embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
 
         #AI model
-        self.llm = Ollama(model=AI_MODEL, temperature=0.7)
+        self.llm = ChatGroq(model="llama-3.3-70b-versatile",api_key=os.getenv("GROQ_API_KEY"),temperature=0.7)
 
         #Vector database
         self.vectorstore= None
@@ -30,7 +36,8 @@ class RAGChatbot:
         #Setup Memory
         self.memory = ConversationBufferMemory(
             memory_key="chat_history",
-            return_messages=True
+            return_messages=True,
+            output_key="answer"
         )
     
     def ingest_documents(self):
@@ -154,14 +161,23 @@ class RAGChatbot:
         qa_chain = ConversationalRetrievalChain.from_llm(
             llm=self.llm,
             retriever=self.hybrid_retriever,
-            memory=self.memory
+            memory=self.memory,
+            return_source_documents=True
         )
         question_with_instruction = f"{question} (Please respond in English only)"
 
         result = qa_chain({"question": question_with_instruction})
-        answer=result['answer'] 
+        answer=result['answer']
+        sources = []
+        for doc in result["source_documents"]:
+            sources.append({
+                "source": doc.metadata.get("source", "Unknown"),
+                "page": str(doc.metadata.get("page", "N/A")),
+                "preview": doc.page_content[:200]
+            })
 
-        return {"answer":answer}
+        return {"answer":answer,
+                "sources": sources}
 
     def clear_history(self):
     

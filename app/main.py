@@ -63,10 +63,12 @@ async def ingest():
 async def query_with_history(request:QueryRequest):
     result=chatbot.query_with_history(request.question)
     answer=result["answer"]
+    sources=result["sources"]
     return {
         "question": request.question,
         "answer": answer,
-        "status": "success"
+        "status": "success",
+        "sources": sources
     }
 @app.post('/clear_history')
 async def clear_history():
