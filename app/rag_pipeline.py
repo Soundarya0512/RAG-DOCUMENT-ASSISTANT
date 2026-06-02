@@ -80,7 +80,7 @@ class RAGChatbot:
                     total_chunks+=len(chunks)
         
         print(f"Total chunks: {total_chunks}")
-        self.build_hybrid_retriever()
+        self.hybrid_retriever=self.build_hybrid_retriever()
         return True
         
 
