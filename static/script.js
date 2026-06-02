@@ -18,7 +18,7 @@ async function send(){
     let question = userinput.value;
     chatarea.innerHTML += "<div class='user-message'>👤 " + question + "</div>";
     status.innerHTML += "🤖 Thinking... "
-    let response=await fetch ("http://localhost:8000/query_with_history",{
+    let response=await fetch ("/query_with_history",{
         method: "POST",
         headers:{
             "Content-Type": "application/json"
@@ -65,7 +65,7 @@ user_file.addEventListener("change",async function(){
     formData.append("file",selectedFile);
 
     // Send to backend
-    let response = await fetch("http://localhost:8000/upload", {
+    let response = await fetch("/upload", {
         method: "POST",
         body: formData
     });
@@ -86,7 +86,7 @@ user_file.addEventListener("change",async function(){
 
 clear.addEventListener("click", async function() {
     
-    await fetch("http://localhost:8000/clear_history", {
+    await fetch("/clear_history", {
         method: "POST"
     });
     

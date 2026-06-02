@@ -1,3 +1,15 @@
+---
+title: RAG Document Assistant
+emoji: 🤖
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
+
 # 🤖 RAG Document Assistant
 
 A full-stack Retrieval-Augmented Generation chat application that lets users upload documents and ask questions.

@@ -1,6 +1,6 @@
 from config import *
 from langchain_community.document_loaders import PyPDFLoader, TextLoader, DirectoryLoader
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.llms import Ollama
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
@@ -22,7 +22,7 @@ load_dotenv()
 class RAGChatbot:
     def __init__(self):
         #Text to vector
-        self.embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
+        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
         #AI model
         self.llm = ChatGroq(model="llama-3.3-70b-versatile",api_key=os.getenv("GROQ_API_KEY"),temperature=0.7)
