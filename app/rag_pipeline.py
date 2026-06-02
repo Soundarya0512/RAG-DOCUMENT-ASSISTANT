@@ -91,8 +91,12 @@ class RAGChatbot:
         try:
             self.vectorstore= Chroma(embedding_function=self.embeddings,persist_directory=VECTOR_DB_PATH)
             print("✅ Vector store loaded!")
-            self.hybrid_retriever=self.build_hybrid_retriever()
-            print("Hybrid retriever ready!")
+            try:
+                self.hybrid_retriever=self.build_hybrid_retriever()
+                print("Hybrid retriever ready!")
+            except Exception as e:
+                print(f"⚠️ Retriever not built yet (empty DB): {e}")
+                print("Users need to upload documents first!")
             return True
  
         
@@ -125,6 +129,11 @@ class RAGChatbot:
     def query(self, question:str):
         "Answer a question using RAG system"
 
+        if self.hybrid_retriever is None:
+            return {
+                "answer": "Please upload a document first using the upload button!",
+                "sources": []}
+
         if self.vectorstore is None:
                 return {"answer": "Error: Please load documents using ingest_documents()",
                         "sources": []}
@@ -153,6 +162,10 @@ class RAGChatbot:
         "sources":sources}
 
     def query_with_history(self, question: str):
+        if self.hybrid_retriever is None:
+            return {
+                "answer": "Please upload a document first using the upload button!",
+                "sources": []}
 
         if self.vectorstore is None:
             return {"answer": "Error: Please load documents using ingest_documents()"}
