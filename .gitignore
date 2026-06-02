@@ -17,3 +17,10 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Large binary files
+data/*.pdf
+data/*.png
+data/*.jpg
+*.pdf
+image.png
